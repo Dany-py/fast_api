@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <style>
+        body{
+        text-align: center;
+        font-size: 2rem;
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        }
+
+        header{
+            margin-top: 10rem;
+        }
+
+        .row{
+            margin: 0.5rem;
+        }
+
+        input {
+            width: 70%;
+            height: 5rem;
+            padding: 0.5rem;
+            font-size: medium;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        btn{
+            border-radius: 20px;
+        }
+
+        #gliss{
+            border: 1px solid #ccc;
+            width: 2rem;
+            background-color: white;
+            margin-left: 0.5rem;
+        }
+
+        #commentaire{
+            margin-top: 1rem;
+            display: none;
+        }
+
+        #texte{
+            width: 70%;
+            height: 5rem;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+        }
+    </style>
+    <title>Document</title>
+</head>
+<body>
+    <header class="container-fluid">
+        <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <h1>
+                    Jero
+                </h1>
+                <h6 style="color: red;">This site is an interface for testing and improving Jero.</h6>
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+    </header>
+
+    <main class="container-fluid">
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <h6 id="jero-output"></h6>
+                <input id = "jero-input"type="text" placeholder="Send a message to Jero"><br>
+                <button type="button" class="btn btn-primary" id="input-send">Send</button>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+    </main>
+
+    <script>
+        const jeroInput = document.querySelector("#jero-input");
+        const jeroOutput = document.querySelector("#jero-output");
+        const inputSend = document.querySelector("#input-send");
+    
+        inputSend.addEventListener("click", () => sendJeroRequest(jeroInput));
+    
+        jeroInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                inputSend.click();
+            }
+        });
+    
+        async function sendJeroRequest(input) {
+            const valeur = input.value.trim();
+            if (!valeur){
+                alert("Veuillez saisir un texte");
+            } // Évite d'envoyer une requête vide
+    
+            jeroOutput.textContent = "";
+            console.log(valeur);
+    
+            try {
+                const response = await fetch("http://localhost:5005/webhooks/rest/webhook", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ sender: "user", message: valeur }),
+                });
+    
+                const data = await response.json();
+                let botResponse = "Sorry, I can not answer this question. Report it as a comment, and try another one."
+    
+                if (data.length > 0 && data[0].text) {
+                    botResponse = data[0].text;
+                }
+    
+                jeroOutput.textContent = botResponse;
+    
+                // Envoie la question et la réponse au serveur Django
+                await fetch("http://127.0.0.1:8000/add_test", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        "question": valeur,
+                        "response": botResponse
+                    }
+                    ),
+                });
+    
+            } catch (error) {
+                console.error("Error:", error);
+                jeroOutput.textContent = "An error occurred. Please try again.";
+            }
+    
+            input.value = ""; // Efface l'input après l'envoi
+        }
+    </script>
+    
+</body>
+</html>
