@@ -6,6 +6,15 @@ from fastapi.responses import HTMLResponse
 from fastapi import Request
 from src.database import get_db
 from src.models import jero_test
+from fastapi.middleware.cors import CORSMiddleware
+
+
+# Liste des origines autorisées
+allowed_origins = [
+    "*"
+    #"http://localhost:3000",  # Ex: Frontend React en local
+    #"https://Jero1onrender.com",   # Ex: Domaine en production
+]
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -38,3 +47,12 @@ async def get_test(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(jero_test))
     test = result.scalars().all()
     return test
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,  # Seuls ces domaines peuvent accéder à l'API
+    allow_credentials=True,
+    allow_methods=["*"],  # Autoriser toutes les méthodes (GET, POST, etc.)
+    allow_headers=["*"],  # Autoriser tous les headers
+)
