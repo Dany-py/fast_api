@@ -41,13 +41,15 @@ async def add_test(data: TestData, db: AsyncSession = Depends(get_db)):
     return {"message": "Test ajouter avec sucès", "user": {"Question": data.question, "Response": data.response}}
 
 
-# Route pour récupérer tous les tests
-@app.get("/test/")
-async def get_test(db: AsyncSession = Depends(get_db)):
+@app.get("/test", response_class=HTMLResponse)
+async def get_test(request: Request, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(jero_test))
-    test = result.scalars().all()
-    return test
+    tests = result.scalars().all()
 
+    # Convertir les objets SQLAlchemy en une liste de dictionnaires
+    test_data = [{"id": t.id, "questions": t.questions, "responses": t.responses} for t in tests]
+
+    return templates.TemplateResponse("test.html", {"request": request, "test_data": test_data})
 
 app.add_middleware(
     CORSMiddleware,

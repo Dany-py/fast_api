@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau des Réponses de Jero</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Question</th>
+                <th>Réponse</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+        </tbody>
+    </table>
+    
+    <script>
+        const testData = JSON.parse('{{ test_data | tojson | safe }}');
+    
+        localStorage.setItem("chatData", JSON.stringify(testData));
+    
+        function populateTable() {
+            const tbody = document.getElementById("table-body");
+            tbody.innerHTML = "";
+            testData.forEach(item => {
+                let row = `<tr>
+                    <td>${item.id}</td>
+                    <td>${item.questions}</td>
+                    <td>${item.responses}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+    
+        populateTable();
+    </script>
+    
+</body>
+</html>
