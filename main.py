@@ -41,7 +41,7 @@ async def add_test(data: TestData, db: AsyncSession = Depends(get_db)):
     return {"message": "Test ajouter avec sucès", "user": {"Question": data.question, "Response": data.response}}
 
 
-@app.get("/test", response_class=HTMLResponse)
+@app.get("/test/", response_class=HTMLResponse)
 async def get_test(request: Request, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(jero_test))
     tests = result.scalars().all()
