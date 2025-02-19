@@ -32,6 +32,7 @@
 
         btn{
             border-radius: 20px;
+            background-color: #007bff;
         }
 
         #gliss{
@@ -53,8 +54,13 @@
             border-radius: 20px;
             outline: none;
         }
+        #convers{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
-    <title>Document</title>
+    <title>Jero</title>
 </head>
 <body>
     <header class="container-fluid">
@@ -64,7 +70,7 @@
                 <h1>
                     Jero
                 </h1>
-                <h6 style="color: red;">This site is an interface for testing and improving Jero.</h6>
+                <h6 style="color: red;">This site is an interface for testing Jero.</h6>
             </div>
             <div class="col-md-4"></div>
         </div>
@@ -74,7 +80,11 @@
         <div class="row">
             <div class="col-md-1"></div>
             <div class="col-md-10">
-                <h6 id="jero-output"></h6>
+                <div class="row" id="convers">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-8" id="conver"></div>
+                    <div class="col-md-2"></div>
+                </div>
                 <input id = "jero-input"type="text" placeholder="Send a message to Jero"><br>
                 <button type="button" class="btn btn-primary" id="input-send">Send</button>
             </div>
@@ -84,8 +94,10 @@
 
     <script>
         const jeroInput = document.querySelector("#jero-input");
-        const jeroOutput = document.querySelector("#jero-output");
         const inputSend = document.querySelector("#input-send");
+
+        const convers = document.querySelector('#convers');
+        const convers1 = document.querySelector('#conver');
     
         inputSend.addEventListener("click", () => sendJeroRequest(jeroInput));
     
@@ -100,10 +112,15 @@
             if (!valeur){
                 alert("Veuillez saisir un texte");
             } // Évite d'envoyer une requête vide
-    
-            jeroOutput.textContent = "";
-            console.log(valeur);
-    
+            
+                jeroInput2 = document.createElement('h6');
+                jeroInput2.style.backgroundColor = "#2e90f8";
+                jeroInput2.style.color = "white";
+                jeroInput2.style.borderRadius = "20px";
+                jeroInput2.style.alignSelf = "flex-end";
+                jeroInput2.style.padding = "0.5rem";
+                jeroInput2.textContent = valeur;
+                convers1.appendChild(jeroInput2);
             try {
                 const response = await fetch("http://localhost:5005/webhooks/rest/webhook", {
                     method: "POST",
@@ -117,11 +134,19 @@
                 if (data.length > 0 && data[0].text) {
                     botResponse = data[0].text;
                 }
-    
+                
+                jeroOutput = document.createElement('h6');
+                jeroOutput.style.backgroundColor = "#ccc";
+                jeroOutput.style.borderRadius = "20px";
+                jeroOutput.style.alignSelf = "flex-start";
+                jeroOutput.style.padding = "0.5rem";
                 jeroOutput.textContent = botResponse;
-    
-                // Envoie la question et la réponse au serveur Django
-                await fetch("http://127.0.0.1:8000/add_test", {
+                convers1.appendChild(jeroOutput);
+
+            input.value = ""; // Efface l'input après l'envoi
+
+            // Envoie la question et la réponse au serveur Django
+            await fetch("https://fast-api-xj59.onrender.com/add_test", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -134,9 +159,8 @@
             } catch (error) {
                 console.error("Error:", error);
                 jeroOutput.textContent = "An error occurred. Please try again.";
-            }
-    
-            input.value = ""; // Efface l'input après l'envoi
+            }    
+                
         }
     </script>
     

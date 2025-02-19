@@ -56,3 +56,5 @@ app.add_middleware(
     allow_methods=["*"],  # Autoriser toutes les méthodes (GET, POST, etc.)
     allow_headers=["*"],  # Autoriser tous les headers
 )
+
+url = "https://fast-api-xj59.onrender.com/"
